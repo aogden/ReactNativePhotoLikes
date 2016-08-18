@@ -24,7 +24,7 @@ class photolikeproj extends Component {
 
 	componentDidMount() {
 		//Standin photos with likes
-		let photos = Array.apply(null, Array(15)).map((v, i) => {	
+		let photos = Array.apply(null, Array(15)).map((v, i) => {
 			return { id: i, src: 'https://placehold.it/200x200?text=' + (i + 1), likes: Math.floor((Math.random() * 1000) + 1) }
 		});
 		photos.sort(function(a,b) { return b.likes - a.likes });
@@ -34,9 +34,37 @@ class photolikeproj extends Component {
 		photos.sort((a,b) => { return (Math.random() * 2) - 1} )
 
 		this.setState({ photos });
+
+		this.fetchInstagramDataAsync();
+	}
+
+	fetchInstagramDataAsync() {
+		return fetch('https://www.instagram.com/taylorswift/media')
+			.then((response) => response.json())
+			.then((responseJson) => {
+				this.updatePhotos(responseJson)
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+	}
+
+	updatePhotos(responseJson) {
+		let fetchedPhotos = responseJson.items.slice(0,15).map((v,i,a) => {
+			return { id: i, src: v.images.low_resolution.url, likes:v.likes.count}
+		});
+		fetchedPhotos.sort(function(a,b) { return b.likes - a.likes });
+		fetchedPhotos.forEach(function(element, index, array) {
+			element["rank"] = index+1;
+		}, this);
+		fetchedPhotos.sort((a,b) => { return (Math.random() * 2) - 1} )
+
+		console.log(fetchedPhotos)
+		this.setState({ photos:fetchedPhotos })
 	}
 
 	render() {
+		console.log(this.state)
 		return (
 			<View style={styles.container}>
 				<Text style={styles.welcome}> Guess Which Pic Was 👍 Most </Text>
@@ -49,6 +77,8 @@ class photolikeproj extends Component {
 class BestGrid extends React.Component {
 
 	render() {
+		console.log('Photos')
+		console.log(this.props.photos)
 		return (
 			<PhotoGrid
 				data = { this.props.photos }
@@ -75,25 +105,21 @@ class BestGrid extends React.Component {
 }
 
 class GridPhoto extends React.Component {
-	
-	constructor(props) {
-		super(props);
-		this.state = { h: 0 }
-	}
+
 
 	componentWillMount() {
+		this.state = { h: 0 }
 	}
 
 	_onPress(item) {
 		LayoutAnimation.easeInEaseOut();
 
 		this.setState({ h: this.state.h === 0 ? 20 : 0 })
-		console.log("likes " + item.likes);
 	}
 
 	render() {
-		console.log(this.props);
-		var likeText = 'Likes ' + this.props.item.likes;
+		console.log(this.props.item)
+		var formattedLikes = formatNumber(this.props.item.likes)
 		return (
 			<TouchableOpacity
 				key = { this.props.item.id }
@@ -107,10 +133,28 @@ class GridPhoto extends React.Component {
 					style = {{ width: this.props.itemSize, height: this.props.itemSize - this.state.h }}
 					source = {{ uri: this.props.item.src }}
 					/>
-				<Text style={[styles.results, { height: this.state.h }]}>#{this.props.item.rank} {this.props.item.likes}👍</Text>
+				<Text style={[styles.results, { height: this.state.h }]}>#{this.props.item.rank} {formattedLikes}👍</Text>
 			</TouchableOpacity>
 		)
 	}
+}
+
+var ranges = [
+  { divider: 1e18 , suffix: 'P' },
+  { divider: 1e15 , suffix: 'E' },
+  { divider: 1e12 , suffix: 'T' },
+  { divider: 1e9 , suffix: 'G' },
+  { divider: 1e6 , suffix: 'M' },
+  { divider: 1e3 , suffix: 'k' }
+];
+
+function formatNumber(n) {
+  for (var i = 0; i < ranges.length; i++) {
+    if (n >= ranges[i].divider) {
+      return (n / ranges[i].divider).toFixed() + ranges[i].suffix;
+    }
+  }
+  return n.toString();
 }
 
 const styles = StyleSheet.create({

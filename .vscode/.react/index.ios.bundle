@@ -1520,44 +1520,51 @@ element["rank"]=index+1;
 photos.sort(function(a,b){return Math.random()*2-1;});
 
 this.setState({photos:photos});
+
+this.fetchInstagramDataAsync();
+}},{key:'fetchInstagramDataAsync',value:function fetchInstagramDataAsync()
+
+{var _this2=this;
+return fetch('https://www.instagram.com/taylorswift/media').
+then(function(response){return response.json();}).
+then(function(responseJson){
+_this2.updatePhotos(responseJson);
+}).
+catch(function(error){
+console.error(error);
+});
+}},{key:'updatePhotos',value:function updatePhotos(
+
+responseJson){
+var fetchedPhotos=responseJson.items.slice(0,15).map(function(v,i,a){
+return{id:i,src:v.images.low_resolution.url,likes:v.likes.count};
+});
+fetchedPhotos.sort(function(a,b){return b.likes-a.likes;});
+fetchedPhotos.forEach(function(element,index,array){
+element["rank"]=index+1;
+},this);
+fetchedPhotos.sort(function(a,b){return Math.random()*2-1;});
+
+console.log(fetchedPhotos);
+this.setState({photos:fetchedPhotos});
 }},{key:'render',value:function render()
 
 {
+console.log(this.state);
 return(
 _react2.default.createElement(_reactNative.View,{style:styles.container},
 _react2.default.createElement(_reactNative.Text,{style:styles.welcome},' Guess Which Pic Was 👍 Most '),
 _react2.default.createElement(BestGrid,{photos:this.state.photos})));
 
 
-}}]);return photolikeproj;}(_react.Component);
-
-
-var styles=_reactNative.StyleSheet.create({
-container:{
-flex:1,
-backgroundColor:'#F5FCFF'},
-
-welcome:{
-fontSize:20,
-textAlign:'center',
-margin:20},
-
-instructions:{
-textAlign:'center',
-color:'#333333',
-marginBottom:5},
-
-results:{
-textAlign:'center',
-fontSize:12,
-backgroundColor:'white',
-height:0}});var
-
+}}]);return photolikeproj;}(_react.Component);var
 
 
 BestGrid=function(_React$Component){babelHelpers.inherits(BestGrid,_React$Component);function BestGrid(){babelHelpers.classCallCheck(this,BestGrid);return babelHelpers.possibleConstructorReturn(this,Object.getPrototypeOf(BestGrid).apply(this,arguments));}babelHelpers.createClass(BestGrid,[{key:'render',value:function render()
 
 {
+console.log('Photos');
+console.log(this.props.photos);
 return(
 _react2.default.createElement(_reactNativePhotoGrid2.default,{
 data:this.props.photos,
@@ -1583,26 +1590,22 @@ _react2.default.createElement(GridPhoto,{key:item.id,item:item,itemSize:itemSize
 
 
 
-GridPhoto=function(_React$Component2){babelHelpers.inherits(GridPhoto,_React$Component2);
+GridPhoto=function(_React$Component2){babelHelpers.inherits(GridPhoto,_React$Component2);function GridPhoto(){babelHelpers.classCallCheck(this,GridPhoto);return babelHelpers.possibleConstructorReturn(this,Object.getPrototypeOf(GridPhoto).apply(this,arguments));}babelHelpers.createClass(GridPhoto,[{key:'componentWillMount',value:function componentWillMount()
 
-function GridPhoto(props){babelHelpers.classCallCheck(this,GridPhoto);var _this3=babelHelpers.possibleConstructorReturn(this,Object.getPrototypeOf(GridPhoto).call(this,
-props));
-_this3.state={h:0};return _this3;
-}babelHelpers.createClass(GridPhoto,[{key:'componentWillMount',value:function componentWillMount()
 
 {
+this.state={h:0};
 }},{key:'_onPress',value:function _onPress(
 
 item){
 _reactNative.LayoutAnimation.easeInEaseOut();
 
 this.setState({h:this.state.h===0?20:0});
-console.log("likes "+item.likes);
 }},{key:'render',value:function render()
 
-{var _this4=this;
-console.log(this.props);
-var likeText='Likes '+this.props.item.likes;
+{var _this5=this;
+console.log(this.props.item);
+var formattedLikes=formatNumber(this.props.item.likes);
 return(
 _react2.default.createElement(_reactNative.TouchableOpacity,{
 key:this.props.item.id,
@@ -1610,16 +1613,57 @@ style:{width:this.props.itemSize,height:this.props.itemSize},
 activeOpacity:1.0,
 onPress:function onPress(){
 
-_this4._onPress(_this4.props.item);
+_this5._onPress(_this5.props.item);
 }},
 _react2.default.createElement(_reactNative.Image,{
 style:{width:this.props.itemSize,height:this.props.itemSize-this.state.h},
 source:{uri:this.props.item.src}}),
 
-_react2.default.createElement(_reactNative.Text,{style:[styles.results,{height:this.state.h}]},'#',this.props.item.rank,' ',this.props.item.likes,'👍')));
+_react2.default.createElement(_reactNative.Text,{style:[styles.results,{height:this.state.h}]},'#',this.props.item.rank,' ',formattedLikes,'👍')));
 
 
 }}]);return GridPhoto;}(_react2.default.Component);
+
+
+var ranges=[
+{divider:1e18,suffix:'P'},
+{divider:1e15,suffix:'E'},
+{divider:1e12,suffix:'T'},
+{divider:1e9,suffix:'G'},
+{divider:1e6,suffix:'M'},
+{divider:1e3,suffix:'k'}];
+
+
+function formatNumber(n){
+for(var i=0;i<ranges.length;i++){
+if(n>=ranges[i].divider){
+return(n/ranges[i].divider).toFixed()+ranges[i].suffix;
+}
+}
+return n.toString();
+}
+
+var styles=_reactNative.StyleSheet.create({
+container:{
+flex:1,
+backgroundColor:'#F5FCFF'},
+
+welcome:{
+fontSize:20,
+textAlign:'center',
+margin:20},
+
+instructions:{
+textAlign:'center',
+color:'#333333',
+marginBottom:5},
+
+results:{
+textAlign:'center',
+fontSize:12,
+backgroundColor:'white',
+height:0}});
+
 
 
 _reactNative.AppRegistry.registerComponent('photolikeproj',function(){return photolikeproj;});
