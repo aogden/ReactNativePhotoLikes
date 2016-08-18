@@ -1,0 +1,1 @@
+Playing around with react native. An app that collects a set of photos and their respective "likes" and has the user guess which one was liked most
