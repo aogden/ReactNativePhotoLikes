@@ -1500,169 +1500,84 @@ var _reactNative=require(43 /* react-native */);
 
 
 
-var _reactNativePhotoGrid=require(634 /* react-native-photo-grid */);var _reactNativePhotoGrid2=babelHelpers.interopRequireDefault(_reactNativePhotoGrid);var
+var _PhotoGuessScene=require(634 /* ./PhotoGuessScene */);var _PhotoGuessScene2=babelHelpers.interopRequireDefault(_PhotoGuessScene);
+var _CelebPickScene=require(636 /* ./CelebPickScene */);var _CelebPickScene2=babelHelpers.interopRequireDefault(_CelebPickScene);var
 
-photolikeproj=function(_Component){babelHelpers.inherits(photolikeproj,_Component);
-function photolikeproj(){babelHelpers.classCallCheck(this,photolikeproj);var _this=babelHelpers.possibleConstructorReturn(this,Object.getPrototypeOf(photolikeproj).call(this));
-
-_this.state={photos:[]};return _this;
-}babelHelpers.createClass(photolikeproj,[{key:'componentDidMount',value:function componentDidMount()
-
-{
-
-var photos=Array.apply(null,Array(15)).map(function(v,i){
-return{id:i,src:'https://placehold.it/200x200?text='+(i+1),likes:Math.floor(Math.random()*1000+1)};
-});
-photos.sort(function(a,b){return b.likes-a.likes;});
-photos.forEach(function(element,index,array){
-element["rank"]=index+1;
-},this);
-photos.sort(function(a,b){return Math.random()*2-1;});
-
-this.setState({photos:photos});
-
-this.fetchInstagramDataAsync();
-}},{key:'fetchInstagramDataAsync',value:function fetchInstagramDataAsync()
-
-{var _this2=this;
-return fetch('https://www.instagram.com/taylorswift/media').
-then(function(response){return response.json();}).
-then(function(responseJson){
-_this2.updatePhotos(responseJson);
-}).
-catch(function(error){
-console.error(error);
-});
-}},{key:'updatePhotos',value:function updatePhotos(
-
-responseJson){
-var fetchedPhotos=responseJson.items.slice(0,15).map(function(v,i,a){
-return{id:i,src:v.images.low_resolution.url,likes:v.likes.count};
-});
-fetchedPhotos.sort(function(a,b){return b.likes-a.likes;});
-fetchedPhotos.forEach(function(element,index,array){
-element["rank"]=index+1;
-},this);
-fetchedPhotos.sort(function(a,b){return Math.random()*2-1;});
-
-console.log(fetchedPhotos);
-this.setState({photos:fetchedPhotos});
+photolikeproj=function(_Component){babelHelpers.inherits(photolikeproj,_Component);function photolikeproj(){babelHelpers.classCallCheck(this,photolikeproj);return babelHelpers.possibleConstructorReturn(this,Object.getPrototypeOf(photolikeproj).apply(this,arguments));}babelHelpers.createClass(photolikeproj,[{key:'renderScene',value:function renderScene(
+route,navigator){
+if(route.name=="CelebPickScene"){
+return _react2.default.createElement(_CelebPickScene2.default,babelHelpers.extends({navigator:navigator},route.passProps));
+}else
+if(route.name=="PhotoGuessScene"){
+return _react2.default.createElement(_PhotoGuessScene2.default,babelHelpers.extends({navigator:navigator},route.passProps));
+}
 }},{key:'render',value:function render()
 
 {
-console.log(this.state);
 return(
-_react2.default.createElement(_reactNative.View,{style:styles.container},
-_react2.default.createElement(_reactNative.Text,{style:styles.welcome},' Guess Which Pic Was 👍 Most '),
-_react2.default.createElement(BestGrid,{photos:this.state.photos})));
+_react2.default.createElement(_reactNative.Navigator,{
+style:{flex:1},
+initialRoute:{
+name:'CelebPickScene',
+title:"Pick a celebrity"},
+
+renderScene:this.renderScene,
+navigationBar:
+_react2.default.createElement(_reactNative.Navigator.NavigationBar,{
+style:styles.nav,
+routeMapper:NavigationBarRouteMapper})}));
 
 
-}}]);return photolikeproj;}(_react.Component);var
+
+}}]);return photolikeproj;}(_react.Component);
 
 
-BestGrid=function(_React$Component){babelHelpers.inherits(BestGrid,_React$Component);function BestGrid(){babelHelpers.classCallCheck(this,BestGrid);return babelHelpers.possibleConstructorReturn(this,Object.getPrototypeOf(BestGrid).apply(this,arguments));}babelHelpers.createClass(BestGrid,[{key:'render',value:function render()
-
-{
-console.log('Photos');
-console.log(this.props.photos);
+var NavigationBarRouteMapper={
+LeftButton:function LeftButton(route,navigator,index,navState){
+if(index>0){
 return(
-_react2.default.createElement(_reactNativePhotoGrid2.default,{
-data:this.props.photos,
-itemsPerRow:3,
-itemMargin:1,
-renderHeader:this.renderHeader,
-renderItem:this.renderItem}));
+_react2.default.createElement(_reactNative.TouchableHighlight,{
+underlayColor:'transparent',
+onPress:function onPress(){if(index>0){navigator.pop();}}},
+_react2.default.createElement(_reactNative.Text,{style:styles.leftNavButtonText},'Back')));
+
+}else
+{return null;}
+},
+RightButton:function RightButton(route,navigator,index,navState){
+if(route.onPress)return(
+_react2.default.createElement(_reactNative.TouchableHighlight,{
+onPress:function onPress(){return route.onPress();}},
+_react2.default.createElement(_reactNative.Text,{style:styles.rightNavButtonText},
+route.rightText||'Right Button')));
 
 
-}},{key:'renderItem',value:function renderItem(
+},
+Title:function Title(route,navigator,index,navState){
+return _react2.default.createElement(_reactNative.Text,{style:styles.title},route.title);
+}};
 
-
-
-
-
-
-
-item,itemSize){
-return(
-_react2.default.createElement(GridPhoto,{key:item.id,item:item,itemSize:itemSize}));
-
-}}]);return BestGrid;}(_react2.default.Component);var
-
-
-
-GridPhoto=function(_React$Component2){babelHelpers.inherits(GridPhoto,_React$Component2);function GridPhoto(){babelHelpers.classCallCheck(this,GridPhoto);return babelHelpers.possibleConstructorReturn(this,Object.getPrototypeOf(GridPhoto).apply(this,arguments));}babelHelpers.createClass(GridPhoto,[{key:'componentWillMount',value:function componentWillMount()
-
-
-{
-this.state={h:0};
-}},{key:'_onPress',value:function _onPress(
-
-item){
-_reactNative.LayoutAnimation.easeInEaseOut();
-
-this.setState({h:this.state.h===0?20:0});
-}},{key:'render',value:function render()
-
-{var _this5=this;
-console.log(this.props.item);
-var formattedLikes=formatNumber(this.props.item.likes);
-return(
-_react2.default.createElement(_reactNative.TouchableOpacity,{
-key:this.props.item.id,
-style:{width:this.props.itemSize,height:this.props.itemSize},
-activeOpacity:1.0,
-onPress:function onPress(){
-
-_this5._onPress(_this5.props.item);
-}},
-_react2.default.createElement(_reactNative.Image,{
-style:{width:this.props.itemSize,height:this.props.itemSize-this.state.h},
-source:{uri:this.props.item.src}}),
-
-_react2.default.createElement(_reactNative.Text,{style:[styles.results,{height:this.state.h}]},'#',this.props.item.rank,' ',formattedLikes,'👍')));
-
-
-}}]);return GridPhoto;}(_react2.default.Component);
-
-
-var ranges=[
-{divider:1e18,suffix:'P'},
-{divider:1e15,suffix:'E'},
-{divider:1e12,suffix:'T'},
-{divider:1e9,suffix:'G'},
-{divider:1e6,suffix:'M'},
-{divider:1e3,suffix:'k'}];
-
-
-function formatNumber(n){
-for(var i=0;i<ranges.length;i++){
-if(n>=ranges[i].divider){
-return(n/ranges[i].divider).toFixed()+ranges[i].suffix;
-}
-}
-return n.toString();
-}
 
 var styles=_reactNative.StyleSheet.create({
-container:{
+leftNavButtonText:{
+fontSize:18,
+marginLeft:5,
+marginTop:2},
+
+rightNavButtonText:{
+fontSize:18,
+marginRight:5,
+marginTop:2},
+
+nav:{
+height:50,
+backgroundColor:'#efefef',
 flex:1,
-backgroundColor:'#F5FCFF'},
+flexDirection:'row'},
 
-welcome:{
-fontSize:20,
-textAlign:'center',
-margin:20},
-
-instructions:{
-textAlign:'center',
-color:'#333333',
-marginBottom:5},
-
-results:{
-textAlign:'center',
-fontSize:12,
-backgroundColor:'white',
-height:0}});
+title:{
+marginTop:2,
+fontSize:15}});
 
 
 
@@ -79164,7 +79079,181 @@ var ReactMount=require(626 /* ./ReactMount */);
 
 module.exports=ReactMount.renderSubtreeIntoContainer;
 }, "react/lib/renderSubtreeIntoContainer.js");
-__d(634 /* react-native-photo-grid/PhotoGrid.js */, function(global, require, module, exports) {'use strict';Object.defineProperty(exports,"__esModule",{value:true});
+__d(634 /* photolikeproj/PhotoGuessScene.js */, function(global, require, module, exports) {Object.defineProperty(exports,"__esModule",{value:true});var _react=require(12 /* react */);var _react2=babelHelpers.interopRequireDefault(_react);
+var _reactNative=require(43 /* react-native */);
+
+
+
+
+
+
+
+var _reactNativePhotoGrid=require(635 /* react-native-photo-grid */);var _reactNativePhotoGrid2=babelHelpers.interopRequireDefault(_reactNativePhotoGrid);var
+
+PhotoGuessScene=function(_Component){babelHelpers.inherits(PhotoGuessScene,_Component);
+function PhotoGuessScene(){babelHelpers.classCallCheck(this,PhotoGuessScene);var _this=babelHelpers.possibleConstructorReturn(this,Object.getPrototypeOf(PhotoGuessScene).call(this));
+
+_this.state={photos:[]};return _this;
+}babelHelpers.createClass(PhotoGuessScene,[{key:'componentDidMount',value:function componentDidMount()
+
+{
+
+var photos=Array.apply(null,Array(15)).map(function(v,i){
+return{id:i,src:'https://placehold.it/200x200?text='+(i+1),likes:Math.floor(Math.random()*1000+1)};
+});
+photos.sort(function(a,b){return b.likes-a.likes;});
+photos.forEach(function(element,index,array){
+element["rank"]=index+1;
+},this);
+photos.sort(function(a,b){return Math.random()*2-1;});
+
+this.setState({photos:photos});
+
+this.fetchInstagramDataAsync();
+}},{key:'fetchInstagramDataAsync',value:function fetchInstagramDataAsync()
+
+{var _this2=this;
+var url='https://www.instagram.com/'+this.props.username+"/media";
+return fetch(url).
+then(function(response){return response.json();}).
+then(function(responseJson){
+_this2.updatePhotos(responseJson);
+}).
+catch(function(error){
+console.error(error);
+});
+}},{key:'updatePhotos',value:function updatePhotos(
+
+responseJson){
+var fetchedPhotos=responseJson.items.slice(0,15).map(function(v,i,a){
+return{id:i,src:v.images.low_resolution.url,likes:v.likes.count};
+});
+fetchedPhotos.sort(function(a,b){return b.likes-a.likes;});
+fetchedPhotos.forEach(function(element,index,array){
+element["rank"]=index+1;
+},this);
+fetchedPhotos.sort(function(a,b){return Math.random()*2-1;});
+
+console.log(fetchedPhotos);
+this.setState({photos:fetchedPhotos});
+}},{key:'render',value:function render()
+
+{
+console.log(this.state);
+return(
+_react2.default.createElement(_reactNative.View,{style:styles.container},
+_react2.default.createElement(BestGrid,{photos:this.state.photos})));
+
+
+}}]);return PhotoGuessScene;}(_react.Component);exports.default=PhotoGuessScene;var
+
+
+BestGrid=function(_React$Component){babelHelpers.inherits(BestGrid,_React$Component);function BestGrid(){babelHelpers.classCallCheck(this,BestGrid);return babelHelpers.possibleConstructorReturn(this,Object.getPrototypeOf(BestGrid).apply(this,arguments));}babelHelpers.createClass(BestGrid,[{key:'render',value:function render()
+
+{
+console.log('Photos');
+console.log(this.props.photos);
+return(
+_react2.default.createElement(_reactNativePhotoGrid2.default,{
+data:this.props.photos,
+itemsPerRow:3,
+itemMargin:1,
+renderHeader:this.renderHeader,
+renderItem:this.renderItem}));
+
+
+}},{key:'renderItem',value:function renderItem(
+
+
+
+
+
+
+
+item,itemSize){
+return(
+_react2.default.createElement(GridPhoto,{key:item.id,item:item,itemSize:itemSize}));
+
+}}]);return BestGrid;}(_react2.default.Component);var
+
+
+
+GridPhoto=function(_React$Component2){babelHelpers.inherits(GridPhoto,_React$Component2);function GridPhoto(){babelHelpers.classCallCheck(this,GridPhoto);return babelHelpers.possibleConstructorReturn(this,Object.getPrototypeOf(GridPhoto).apply(this,arguments));}babelHelpers.createClass(GridPhoto,[{key:'componentWillMount',value:function componentWillMount()
+
+
+{
+this.state={h:0};
+}},{key:'_onPress',value:function _onPress(
+
+item){
+_reactNative.LayoutAnimation.easeInEaseOut();
+
+this.setState({h:this.state.h===0?20:0});
+}},{key:'render',value:function render()
+
+{var _this5=this;
+console.log(this.props.item);
+var formattedLikes=formatNumber(this.props.item.likes);
+return(
+_react2.default.createElement(_reactNative.TouchableOpacity,{
+key:this.props.item.id,
+style:{width:this.props.itemSize,height:this.props.itemSize},
+activeOpacity:1.0,
+onPress:function onPress(){
+
+_this5._onPress(_this5.props.item);
+}},
+_react2.default.createElement(_reactNative.Image,{
+style:{width:this.props.itemSize,height:this.props.itemSize-this.state.h},
+source:{uri:this.props.item.src}}),
+
+_react2.default.createElement(_reactNative.Text,{style:[styles.results,{height:this.state.h}]},'#',this.props.item.rank,' ',formattedLikes,'👍')));
+
+
+}}]);return GridPhoto;}(_react2.default.Component);
+
+
+var ranges=[
+{divider:1e18,suffix:'P'},
+{divider:1e15,suffix:'E'},
+{divider:1e12,suffix:'T'},
+{divider:1e9,suffix:'G'},
+{divider:1e6,suffix:'M'},
+{divider:1e3,suffix:'k'}];
+
+
+function formatNumber(n){
+for(var i=0;i<ranges.length;i++){
+if(n>=ranges[i].divider){
+return(n/ranges[i].divider).toFixed()+ranges[i].suffix;
+}
+}
+return n.toString();
+}
+
+var styles=_reactNative.StyleSheet.create({
+container:{
+flex:1,
+backgroundColor:'#F5FCFF',
+paddingTop:50},
+
+welcome:{
+fontSize:20,
+textAlign:'center',
+margin:20},
+
+instructions:{
+textAlign:'center',
+color:'#333333',
+marginBottom:5},
+
+results:{
+textAlign:'center',
+fontSize:12,
+backgroundColor:'white',
+height:0}});
+}, "photolikeproj/PhotoGuessScene.js");
+__d(635 /* react-native-photo-grid/PhotoGrid.js */, function(global, require, module, exports) {'use strict';Object.defineProperty(exports,"__esModule",{value:true});
 
 var _react=require(12 /* react */);var _react2=babelHelpers.interopRequireDefault(_react);
 var _reactNative=require(43 /* react-native */);
@@ -79237,6 +79326,180 @@ items.map(function(item){return _this2.props.renderItem(item,itemWidth);})));
 
 PhotoGrid;
 }, "react-native-photo-grid/PhotoGrid.js");
+__d(636 /* photolikeproj/CelebPickScene.js */, function(global, require, module, exports) {Object.defineProperty(exports,"__esModule",{value:true});var _react=require(12 /* react */);var _react2=babelHelpers.interopRequireDefault(_react);
+var _reactNative=require(43 /* react-native */);
+
+
+
+
+
+
+
+
+
+
+
+var _insta=require(637 /* ./insta.json */);var _insta2=babelHelpers.interopRequireDefault(_insta);var
+
+CelebPickScene=function(_Component){babelHelpers.inherits(CelebPickScene,_Component);
+function CelebPickScene(props)
+{babelHelpers.classCallCheck(this,CelebPickScene);var _this=babelHelpers.possibleConstructorReturn(this,Object.getPrototypeOf(CelebPickScene).call(this,
+props));
+var ds=new _reactNative.ListView.DataSource({rowHasChanged:function rowHasChanged(r1,r2){return r1!==r2;}});
+_this.state={
+dataSource:ds.cloneWithRows(_insta2.default.usernames),
+selectedRowData:""};return _this;
+
+}babelHelpers.createClass(CelebPickScene,[{key:'onPress',value:function onPress(
+
+rowData){
+console.log(rowData);
+this.setState({selectedRowData:rowData});
+this.props.navigator.push({
+name:"PhotoGuessScene",
+passProps:{username:rowData},
+title:"Guess Which Pic Was 👍 Most"});
+
+}},{key:'renderRow',value:function renderRow(
+
+rowData){var _this2=this;
+return(
+_react2.default.createElement(_reactNative.TouchableHighlight,{onPress:function onPress(){return _this2.onPress(rowData);}},
+_react2.default.createElement(_reactNative.View,{style:styles.row},
+_react2.default.createElement(_reactNative.Text,null,rowData))));
+
+
+
+}},{key:'render',value:function render()
+
+{var _this3=this;
+return(
+_react2.default.createElement(_reactNative.View,{style:{paddingTop:50,flex:1}},
+_react2.default.createElement(_reactNative.ListView,{
+dataSource:this.state.dataSource,
+renderRow:function renderRow(rowData){return _this3.renderRow(rowData);}})));
+
+
+
+}}]);return CelebPickScene;}(_react.Component);exports.default=CelebPickScene;
+
+
+var styles=_reactNative.StyleSheet.create({
+row:{
+flexDirection:'row',
+justifyContent:'center',
+padding:5},
+
+thumb:{
+width:64,
+height:64},
+
+text:{
+flex:1}});
+}, "photolikeproj/CelebPickScene.js");
+__d(637 /* photolikeproj/insta.json */, function(global, require, module, exports) {module.exports = {
+"usernames":[
+"70sbabes",
+"amypoehlersmartgirls",
+"amyschumer",
+"arthurelgort",
+"baddiewinkle",
+"badgalriri",
+"balvenieboy",
+"bangbangnyc",
+"banksyny",
+"beigecardigan",
+"benlowy",
+"berrics",
+"best_coast",
+"betches",
+"beyonce",
+"broadcity",
+"caradelevigne",
+"champagnepapi",
+"chrissamnee",
+"chrissyteigen",
+"classicwrestling",
+"coryrichards",
+"craptaxidermy",
+"danbilzerian",
+"dannybones64",
+"dcmism",
+"dogsofinstagram",
+"dolphziggler",
+"drandallblythe",
+"fashiondads_",
+"feliciaday",
+"fuckjerry",
+"gweelos",
+"h0tgirlseatingpizza",
+"hanksynyc",
+"hawkeyehuey",
+"hotdudeswithdogs",
+"humansofny",
+"humzadeas",
+"iamdiddy",
+"iamlenaheadey",
+"iansomerhalder",
+"imamysedaris",
+"jamesfrancotv",
+"jonwurster",
+"jr",
+"kanyedoingthings",
+"katdenningsss",
+"katyperry",
+"kellyslater",
+"kerrywashington",
+"kimkardashian",
+"kimletgordon",
+"kingjames",
+"lenadunham",
+"madonna",
+"magnumphotos",
+"markseliger",
+"marniethedog",
+"marthacoopergram",
+"mikeescamilla",
+"mileycyrus",
+"miserable_men",
+"mr_camron",
+"mydaywithleo",
+"nasa",
+"natgeo",
+"nbcsnl",
+"nickiminaj",
+"nlyonne",
+"officerpatrickcarney",
+"osgemeos",
+"passengershaming",
+"prattprattpratt",
+"questlove",
+"raskalov",
+"reesewitherspoon",
+"satiregram",
+"serenawilliams",
+"seriousdesign",
+"spencerhibert",
+"starwars",
+"steveyeun",
+"taylorswift",
+"teamcoco",
+"teamswish",
+"textsfromyourex",
+"thatlookslikeadick",
+"thefatjewish",
+"therock",
+"thesartorialist",
+"thisoldshirt",
+"tindernightmares",
+"tonyhawk",
+"tsa",
+"usainbolt",
+"waverider_",
+"whymykidwascrying",
+"yokoonoofficial",
+"yungjake"]};
+}, "photolikeproj/insta.json");
 ;require(187);
 ;require(0);
 //# sourceMappingURL=index.ios.map
