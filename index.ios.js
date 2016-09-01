@@ -61,6 +61,7 @@ var NavigationBarRouteMapper = {
 	RightButton(route, navigator, index, navState) {
 		if (route.onPress) return (
 			<TouchableHighlight
+				underlayColor="transparent"
 				onPress={ () => route.onPress() }>
 				<Text style={ styles.rightNavButtonText }>
 					{ route.rightText || 'Right Button' }

@@ -25,7 +25,6 @@ export default class CelebPickScene extends Component {
 	}
 
 	onPress(rowData) {
-		console.log(rowData)
 		this.setState({selectedRowData:rowData});
 		this.props.navigator.push({
 			name: "PhotoGuessScene",

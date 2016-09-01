@@ -12,7 +12,13 @@ import PhotoGrid from 'react-native-photo-grid';
 export default class PhotoGuessScene extends Component {
 	constructor() {
 		super();
-		this.state = { photos: [] };
+		this.state = { photos: [], paginationId:Infinity, photoIdSuffix:''};
+	}
+
+	componentWillMount() {
+		console.log(this.props.navigator.getCurrentRoutes());
+		this.props.navigator.getCurrentRoutes()[1].onPress = this.onPressNext.bind(this);
+		this.props.navigator.getCurrentRoutes()[1].rightText = 'Next';
 	}
 
 	componentDidMount() {
@@ -31,11 +37,22 @@ export default class PhotoGuessScene extends Component {
 		this.fetchInstagramDataAsync();
 	}
 
+	onPressNext() {
+		console.log('press next '+this)
+		this.fetchInstagramDataAsync();
+	}
+
 	fetchInstagramDataAsync() {
-		let url = 'https://www.instagram.com/'+this.props.username+"/media"
+		var url = 'https://www.instagram.com/'+this.props.username+"/media"
+
+		//If we are fetching next batch use pagination id
+		if(this.state.paginationId < Infinity)
+			url += "?max_id="+this.state.paginationId+this.state.photoIdSuffix;
+
 		return fetch(url)
 			.then((response) => response.json())
 			.then((responseJson) => {
+				console.log(responseJson);
 				this.updatePhotos(responseJson)
 			})
 			.catch((error) => {
@@ -45,7 +62,9 @@ export default class PhotoGuessScene extends Component {
 
 	updatePhotos(responseJson) {
 		let fetchedPhotos = responseJson.items.slice(0,15).map((v,i,a) => {
-			return { id: i, src: v.images.low_resolution.url, likes:v.likes.count}
+			var stringTokens = v.id.split('_')
+			this.state.photoIdSuffix = '_'+stringTokens[1]
+			return { id: i, src: v.images.low_resolution.url, likes:v.likes.count, imageBaseId:parseInt(stringTokens[0])}
 		});
 		fetchedPhotos.sort(function(a,b) { return b.likes - a.likes });
 		fetchedPhotos.forEach(function(element, index, array) {
@@ -53,12 +72,14 @@ export default class PhotoGuessScene extends Component {
 		}, this);
 		fetchedPhotos.sort((a,b) => { return (Math.random() * 2) - 1} )
 
-		console.log(fetchedPhotos)
+		this.state.paginationId = fetchedPhotos.reduce(function(min, cur) {
+				return Math.min(min,cur.imageBaseId)
+			},this.state.paginationId)
+
 		this.setState({ photos:fetchedPhotos })
 	}
 
 	render() {
-		console.log(this.state)
 		return (
 			<View style={styles.container}>
 				<BestGrid photos={this.state.photos}/>
@@ -70,8 +91,6 @@ export default class PhotoGuessScene extends Component {
 class BestGrid extends React.Component {
 
 	render() {
-		console.log('Photos')
-		console.log(this.props.photos)
 		return (
 			<PhotoGrid
 				data = { this.props.photos }
@@ -111,7 +130,6 @@ class GridPhoto extends React.Component {
 	}
 
 	render() {
-		console.log(this.props.item)
 		var formattedLikes = formatNumber(this.props.item.likes)
 		return (
 			<TouchableOpacity
