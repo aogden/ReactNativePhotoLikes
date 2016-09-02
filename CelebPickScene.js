@@ -37,7 +37,7 @@ export default class CelebPickScene extends Component {
 		return(
 			<TouchableHighlight onPress= { () => this.onPress(rowData) }>
 				<View style={styles.row}>
-					<Text>{rowData}</Text>
+					<Text style={styles.text}>{rowData}</Text>
 				</View>
 			</TouchableHighlight>
 		)
@@ -67,5 +67,7 @@ var styles = StyleSheet.create({
   },
   text: {
     flex: 1,
+	fontSize: 24,
+	textAlign: 'center',
   },
 });
